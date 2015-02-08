@@ -43,25 +43,6 @@ def getNeighbouringRooms(xCoord, yCoord):
         southernRoom, westernRoom
 
 
-def getDesc(room):
-    descriptions = {
-        "kitchen": [
-            ["This is a plain kitchen", "Nothing fancy to see here. You're "
-             "surprised that somebody must have cleaned this place lately"],
-            ["This is a dirty kitchen", "You see dirty dishes and many used "
-             "glasses and mugs. Somebody should clean them."]
-        ],
-        "hallway": [
-            ["A very slim hallway", "It seems so crowded here. Hard to "
-             "explore, you might as well move on"],
-            ["A huge hallway", "Are you sure you can see to the other "
-             "side of the room? Why is this room so big?"]
-        ]
-    }
-
-    return random.choice(descriptions[room.name])
-
-
 class AbstractRoom(object):
     """The map is made up of rooms that the player can access.
 
@@ -73,10 +54,12 @@ class AbstractRoom(object):
         The y coordinate of the room
 
     """
+    _descriptions = None
+    _numCoffeePads = 0
 
     def __init__(self, xCoord, yCoord):
         self._x, self._y = xCoord, yCoord
-        self.shortDesc, self.longDesc = getDesc(self)
+        self.shortDesc, self.longDesc = self._getDesc()
 
     def north():
         doc = "Room to the North of the current one"
@@ -126,6 +109,14 @@ class AbstractRoom(object):
         return locals()
     y = property(**y())
 
+    def canConsumeCoffee():
+        doc = "Can the user cosume coffee here?"
+
+        def fget(self):
+            return self._numCoffeePads > 0
+        return locals()
+    canConsumeCoffee = property(**canConsumeCoffee())
+
     shortDesc = None
     longDesc = None
     takeable = None
@@ -134,6 +125,8 @@ class AbstractRoom(object):
     def printRoom(self):
         description = ('\n\n' + self.name + '\n========\n\n\n' +
                        self.shortDesc + '\n' + self.longDesc + '\n\n' +
+                       'There are ' + str(self._numCoffeePads) +
+                       ' Coffee Pads here\n\n' +
                        'Northern Room: ' + self.north.name + '\n' +
                        'Eastern Room: ' + self.east.name + '\n' +
                        'Southern Room: ' + self.south.name + '\n' +
@@ -146,18 +139,44 @@ class AbstractRoom(object):
             getNeighbouringRooms(self.x, self.y)
         self.printRoom()
 
+    def consumeCoffee(self):
+        """Consume some of the delicious coffee here"""
+        if self.canConsumeCoffee:
+            self._numCoffeePads -= 1
+            return True
+        else:
+            return False
+
+    def _getDesc(self):
+        if self._descriptions is None:
+            raise NotImplemented('No Descriptions for this room available')
+        return random.choice(self._descriptions)
+
 
 class Kitchen(AbstractRoom):
     """The room where most coffee can be found"""
     name = "kitchen"
+    _descriptions = [
+        ("This is a plain kitchen", "Nothing fancy to see here. You're "
+         "surprised that somebody must have cleaned this place lately"),
+        ("This is a dirty kitchen", "You see dirty dishes and many used "
+         "glasses and mugs. Somebody should clean them.")
+    ]
 
     def __init__(self, *arg):
         super(Kitchen, self).__init__(*arg)
+        self._numCoffeePads = random.randrange(1, 4)
 
 
 class Hallway(AbstractRoom):
     """A common room through which you move on"""
     name = "hallway"
+    _descriptions = [
+        ("A very slim hallway", "It seems so crowded here. Hard to "
+         "explore, you might as well move on"),
+        ("A huge hallway", "Are you sure you can see to the other "
+         "side of the room? Why is this room so big?")
+    ]
 
     def __init__(self, *arg):
         super(Hallway, self).__init__(*arg)

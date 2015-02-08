@@ -19,6 +19,22 @@ class TextCoffeCmd(cmd.Cmd):
         """Fighting is exhausting. Get some coffee first."""
         print('Fighting is exhausting. Get some coffee first.')
 
+    def do_coffee(self, arg):
+        """Drink a cup of coffee and gain experience"""
+        if self.player.drinkCoffee():
+            print('What a delicious cup of coffee')
+            print('Your Experience is now ' + str(self.player.experience))
+        else:
+            print('You cannot consume coffee here')
+
+    def do_coffeination(self, arg):
+        """Drink all the coffee in the room"""
+        if self.player.drinkAllCoffee():
+            print('Coffeeparty!!!!!!!')
+            print('Your Experience is now ' + str(self.player.experience))
+        else:
+            print('You cannot consume coffee here')
+
     def moveTo(self, dest):
         self.player.currentRoom = dest
 

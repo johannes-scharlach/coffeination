@@ -30,11 +30,7 @@ class CreateCharacterCmd(cmd.Cmd):
 
     def do_ready(self, arg):
         """Quit creating your character and start exploring"""
-        try:
-            name = self.player.name
-        except:
-            name = None
-        if not name:
+        if not self.player.name:
             print('Please set a name before you continue')
             return False
         return True
@@ -42,6 +38,9 @@ class CreateCharacterCmd(cmd.Cmd):
 
 class Player(object):
     """docstring for Player"""
+    experience = 0
+    name = None
+    profession = None
 
     def currentRoom():
         doc = "The currentRoom property."
@@ -61,3 +60,18 @@ class Player(object):
             del self._currentRoom
         return locals()
     currentRoom = property(**currentRoom())
+
+    def drinkCoffee(self):
+        """Drink coffee from the current room"""
+        if self.currentRoom.consumeCoffee():
+            self.experience += 1
+            return True
+        return False
+
+    def drinkAllCoffee(self):
+        """Drink all coffee from the current room"""
+        drankCoffee = False
+        while self.currentRoom.canConsumeCoffee:
+            self.drinkCoffee()
+            drankCoffee = True
+        return drankCoffee

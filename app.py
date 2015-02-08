@@ -5,6 +5,7 @@ from player import CreateCharacterCmd
 from cli import TextCoffeCmd
 
 if __name__ == '__main__':
+    print('=======================')
     print('Welcome to Coffeintaion')
     print('=======================')
     print('')
@@ -15,7 +16,7 @@ if __name__ == '__main__':
     ccc.cmdloop()
     player = ccc.player
     print('')
-    print('Great, you\'re now ready to explore, ' + player.name)
+    print('Great! You\'re now ready to explore, ' + player.name)
 
     player.currentRoom = mapping(0, 0)
 
